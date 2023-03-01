@@ -6,6 +6,7 @@ import random
 import re
 import sys
 import time
+
 import requests
 
 # 推送server酱
@@ -150,7 +151,7 @@ def login(user, password):
     data2 = {
         "allow_registration=": "false",
         "app_name": "com.xiaomi.hm.health",
-        "app_version": "6.5.5",
+        "app_version": "6.3.5",
         "code": f"{code}",
         "country_code": "CN",
         "device_id": "2C8B4939-0CCD-4E94-8CBA-CB8EA6E613A1",
@@ -178,6 +179,7 @@ def main(_user, _passwd, min_1, max_1):
     user = str(_user)
     password = str(_passwd)
     step = str(random.randint(min_1, max_1))
+    # step = str(26702)
     print("已设置为随机步数(" + str(min_1) + "~" + str(max_1) + ")")
     if user == '' or password == '':
         print("用户名或密码填写有误！")
@@ -210,16 +212,25 @@ def main(_user, _passwd, min_1, max_1):
 
     response = requests.post(url, data=data, headers=head).json()
     # print(response)
-    result = f"时间：[{now}]\n\n\n\n账号：{user[:3]}****{user[7:]}\n\n\n\n步数：{step}\n\n\n\n状态：[" + response['message'] + "]\n\n\n\n______________________________\n\n\n\n"
+    result = f"[{now}]\n\n{user[:3]}****{user[7:]} 改步（{step}）\\[" + response['message'] + "]\n\n"
     print(result)
     return result
 
 # 获取时间戳
+# def get_time():
+#     url = 'https://api.m.jd.com/client.action?functionId=queryMaterialProducts&client=wh5'
+#     response = requests.get(url, headers=headers).json()
+#     t = response['currentTime2']
+#     return t
 def get_time():
-    url = 'https://api.m.jd.com/client.action?functionId=queryMaterialProducts&client=wh5'
-    response = requests.get(url, headers=headers).json()
-    t = response['currentTime2']
-    return t
+    try:
+        url = "http://api.m.taobao.com/rest/api3.do?api=mtop.common.getTimestamp"
+        response = requests.get(url, headers=self.headers).json()
+        t = response["data"]["t"]
+        return t
+    except Exception as e:
+        print(e)
+        return
 
 
 # 获取app_token
@@ -239,7 +250,7 @@ def push_wx(desp=""):
     else:
         server_url = f"https://sctapi.ftqq.com/{sckey}.send"
         params = {
-            "text": '🍍邮箱版运动步数修改🍍',
+            "text": '【✍小米运动步数修改✍】',
             "desp": desp
         }
 
